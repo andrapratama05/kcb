@@ -1,2 +1,1 @@
-# kcb
 # Kecerdasan Buatan
