@@ -1,0 +1,5 @@
+.venv
+.vscode
+__pycache__
+*.pyc
+Jurnal/ UAS/ English/ Ver.pdf
