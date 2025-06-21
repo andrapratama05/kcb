@@ -67,6 +67,7 @@ rich==14.0.0
 rich-toolkit==0.14.7
 rpds-py==0.25.1
 scikit-fuzzy==0.5.0
+scikit-learn==1.7.0
 scipy==1.15.3
 seaborn==0.13.2
 setuptools==80.9.0
@@ -82,6 +83,7 @@ tensorboard==2.19.0
 tensorboard-data-server==0.7.2
 tensorflow==2.19.0
 termcolor==3.1.0
+threadpoolctl==3.6.0
 toml==0.10.2
 tornado==6.5.1
 tqdm==4.67.1

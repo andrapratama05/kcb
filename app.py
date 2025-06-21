@@ -3,17 +3,18 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from skfuzzy import cluster
+from sklearn.metrics import silhouette_score
 from scipy.spatial import ConvexHull
 import io
 
 st.set_page_config(page_title="Clustering Produksi Daging", layout="wide")
 st.title("📊 Aplikasi Clustering Fuzzy C-Means Produksi Daging di Indonesia")
 
-# === Upload File ===
+# Upload File 
 uploaded_file = st.file_uploader("Unggah file CSV produksi daging", type="csv")
 
 if uploaded_file:
-    # === Load dan tampilkan data awal ===
+    # Load dan tampilkan data awal
     df = pd.read_csv(uploaded_file)
     st.subheader("📌 Data Awal")
     st.dataframe(df)
@@ -25,11 +26,44 @@ if uploaded_file:
         st.success(f"Data telah dibersihkan ({len(df) - len(df)} baris dihapus)")
         st.subheader("✅ Data Setelah Pembersihan")
         st.dataframe(df)
-
-    # === FCM Clustering ===
+    
     features = df.columns[1:]
     data = df[features].T.values
-    n_clusters = st.number_input("Jumlah Cluster", 2, 10, 3, 1)
+    
+    # Silhouette Score
+    with st.expander("🔎 Cari jumlah Cluster Ideal (Silhouette Score): "):
+        min_clusters = st.slider("Jumlah Cluster Minimum", 2, 5, 2)
+        max_clusters = st.slider("Jumlah Cluster Maksimum", 3, 10, 5)
+        
+        best_k = None
+        if st.button("Hitung Silhouette Score"):
+            scores = []
+            range_k = list(range(min_clusters, max_clusters + 1))
+            
+            for k in range_k:
+                cntr, u, _, _, _, _, _ = cluster.cmeans(data, c=k, m=2, error=0.005, maxiter=1000)
+                labels_k = u.argmax(axis=0)
+                try:
+                    score = silhouette_score(data.T, labels_k)
+                except:
+                    score = -1
+                scores.append(score)
+
+            fig_score, ax = plt.subplots()
+            ax.bar(range_k, scores, color='skyblue')
+            ax.set_title("Skor Siluet untuk Tiap Jumlah Cluster")
+            ax.set_xlabel("Jumlah Cluster")
+            ax.set_ylabel("Silhouette Score")
+            st.pyplot(fig_score)
+            
+            best_k = range_k[np.argmax(scores)]
+            st.success(f"✅ Jumlah cluster terbaik adalah {best_k} dengan skor {max(scores): .2f}")
+            
+    
+    # Fuzzy C Means Clustering
+    st.subheader("🔧 Clustering")
+    default_k = best_k if best_k else 3
+    n_clusters = st.number_input("Jumlah Cluster", 2, 10, default_k, 1)
 
     cntr, u, _, _, _, _, _ = cluster.cmeans(data, c=n_clusters, m=2, error=0.005, maxiter=1000)
     labels = u.argmax(axis=0)
@@ -39,7 +73,7 @@ if uploaded_file:
     df.insert(0, 'No', np.arange(1, len(df) +1))
     st.dataframe(df, use_container_width=True, hide_index=True)
 
-    # === Visualisasi Clustering ===
+    # Visualisasi Clustering
     st.subheader("📈 Visualisasi Clustering")
 
     selected_features = st.multiselect(
