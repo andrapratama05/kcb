@@ -1,7 +1,7 @@
 # Kecerdasan Buatan
 
 Tutorial menjalankan:
-1. Buat virtual environment dahulu: <br/>
+1. Buat virtual environment dahulu (Windows): <br/>
     ```py -m venv .venv```
 2. Aktivasi virtual environment (Windows): <br/>
     ```.venv\Scripts\activate```
